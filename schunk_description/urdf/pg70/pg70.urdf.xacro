@@ -39,9 +39,9 @@
     <joint name="${name}_finger_left_joint" type="prismatic" >
       <parent link="${name}_gripper_link" />
       <child link="${name}_finger_left_link" />
-      <limit effort="100" lower="-0.001" upper="0.0345" velocity="2.0"/>
+      <limit effort="100" lower="-0.001" upper="0.033" velocity="2.0"/>
       <calibration rising="${pg70_finger_left_ref}"/>
-      <origin xyz="0 0.0105 0.0789" rpy="0 0 0"/>
+      <origin xyz="0 0.0105 ${0.0789-0.01}" rpy="0 0 0"/>
       <axis xyz="0 1 0" />
     </joint>
 
@@ -52,16 +52,18 @@
         <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01" />
       </inertial>
       <visual>
+        <origin xyz="0 0 0.05" rpy="0 0 0" />
         <geometry>
-          <box size="0.03 0.01 0.01"/>
+          <box size="0.03 0.02 0.10"/>
         </geometry>
         <material name="black">
           <color rgba="0 0 0 1"/>
         </material>
       </visual>
       <collision>
+        <origin xyz="0 0 0.05" rpy="0 0 0" />
         <geometry>
-          <box size="0.03 0.01 0.01"/>
+          <box size="0.03 0.02 0.10"/>
         </geometry>
         <material name="black">
           <color rgba="0 0 0 1"/>
@@ -73,9 +75,9 @@
       <mimic joint="${name}_finger_left_joint" multiplier="1" offset="0"/>
       <parent link="${name}_gripper_link" />
       <child link="${name}_finger_right_link" />
-      <limit effort="100" lower="-0.001" upper="0.0345" velocity="2.0"/>
+      <limit effort="100" lower="-0.001" upper="0.033" velocity="2.0"/>
       <calibration rising="${pg70_finger_right_ref}"/>
-      <origin xyz="0 -0.0105 0.0789" rpy="-0 0 0"/>
+      <origin xyz="0 -0.0105 ${0.0789-0.01}" rpy="-0 0 0"/>
       <axis xyz="0 -1 0" />
     </joint>
 
@@ -86,16 +88,18 @@
         <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01" />
       </inertial>
       <visual>
+        <origin xyz="0 0 0.05" rpy="0 0 0" />
         <geometry>
-          <box size="0.03 0.01 0.01"/>
+          <box size="0.03 0.02 0.10"/>
         </geometry>
         <material name="black">
           <color rgba="0 0 0 1"/>
         </material>
       </visual>
       <collision>
+        <origin xyz="0 0 0.05" rpy="0 0 0" />
         <geometry>
-          <box size="0.03 0.01 0.01"/>
+          <box size="0.03 0.02 0.10"/>
         </geometry>
         <material name="black">
           <color rgba="0 0 0 1"/>
