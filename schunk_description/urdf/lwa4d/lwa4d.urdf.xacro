@@ -38,14 +38,14 @@
 
     <!-- joint between arm_0_link and arm_1_link -->
     <joint name="${name}_1_joint" type="revolute">
-      <origin xyz="0 0 0.15" rpy="0 -${M_PI} 0"/>
+      <origin xyz="0 0 0.15" rpy="0 -${M_PI} ${M_PI}"/>
       <parent link="${name}_0_link"/>
       <child link="${name}_1_link"/>
       <axis xyz="0 0 1"/>
       <calibration rising="${arm_1_ref}"/>
       <dynamics damping="10" />
-      <limit effort="370" velocity="2.0" lower="-3.438" upper="2.846"/>
-      <safety_controller k_position="20" k_velocity="50" soft_lower_limit="${-3.438 + 0.01}" soft_upper_limit="${2.846 - 0.01}" />
+      <limit effort="370" velocity="2.0" lower="-3.1" upper="3.1"/>
+      <safety_controller k_position="20" k_velocity="50" soft_lower_limit="${-3.1 + 0.01}" soft_upper_limit="${3.1 - 0.01}" />
     </joint>
 
     <link name="${name}_1_link">
