@@ -12,13 +12,14 @@
       <parent link="${parent}" />
       <child link="${name}_0_link" />
     </joint>
-
+    
     <link name="${name}_0_link">
-      <inertial>
+      <xacro:default_inertial/>	
+      <!--inertial>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <mass value="1.0"/>
         <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01" />
-      </inertial>
+      </inertial-->
 
       <visual>
         <origin xyz="0 0 0.004" rpy="0 0 0" />
@@ -44,17 +45,18 @@
       <axis xyz="0 0 1"/>
       <calibration rising="${arm_1_ref}"/>
       <dynamics damping="10" />
-      <limit effort="370" velocity="2.0" lower="-3.1" upper="3.1"/>
+      <limit effort="216" velocity="0.43633" lower="-3.1" upper="3.1"/>
       <safety_controller k_position="20" k_velocity="50" soft_lower_limit="${-3.1 + 0.01}" soft_upper_limit="${3.1 - 0.01}" />
     </joint>
 
     <link name="${name}_1_link">
-      <inertial>
+      <xacro:default_inertial/>	
+      <!--inertial>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <!--mass value="5.9907"/-->
-        <mass value="2.0"/>
+        <!--mass value="2.0"/>
         <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01" />
-      </inertial>
+      </inertial-->
       
       <visual>
         <origin xyz="0 0 -0.15" rpy="0 0 ${M_PI}" />
@@ -80,16 +82,17 @@
       <axis xyz="0 0 1"/>
       <calibration rising="${arm_2_ref}"/>
       <dynamics damping="10" />
-      <limit effort="370" velocity="2.0" lower="-2.14675498" upper="2.14675498"/>
-      <safety_controller k_position="20" k_velocity="50" soft_lower_limit="${-2.14675498 + 0.01}"   soft_upper_limit="${2.14675498 - 0.01}" />
+      <limit effort="216" velocity="0.43633" lower="-2.14" upper="2.14"/>
+      <safety_controller k_position="20" k_velocity="50" soft_lower_limit="${-2.14 + 0.01}"   soft_upper_limit="${2.14 - 0.01}" />
     </joint>
 
     <link name="${name}_2_link">
-      <inertial>
+      <xacro:default_inertial/>	
+      <!--inertial>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <mass value="2.0"/>
         <inertia ixx="0.03" ixy="0" ixz="0" iyy="0.03" iyz="0" izz="0.03" />
-      </inertial>
+      </inertial-->
       
       <visual>
         <origin xyz="0 0 0" rpy="0 0 ${M_PI}" />
@@ -115,16 +118,17 @@
       <axis xyz="0 0 1"/>
       <calibration rising="${arm_3_ref}"/>
       <dynamics damping="5" />
-      <limit effort="176" velocity="2.0" lower="-3.141592654" upper="3.141592654"/>
-      <safety_controller k_position="20" k_velocity="25" soft_lower_limit="${-3.141592654 + 0.01}" soft_upper_limit="${3.141592654 - 0.01}" />
+      <limit effort="81.5" velocity="0.4189" lower="-M_PI" upper="M_PI"/>
+      <safety_controller k_position="20" k_velocity="25" soft_lower_limit="${-M_PI + 0.01}" soft_upper_limit="${M_PI - 0.01}" />
     </joint>
 
     <link name="${name}_3_link">
-      <inertial>
+      <xacro:default_inertial/>	
+      <!--inertial>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <mass value="2.0"/>
         <inertia ixx="0.03" ixy="0" ixz="0" iyy="0.03" iyz="0" izz="0.03" />
-      </inertial>
+      </inertial-->
       
       <visual>
         <origin xyz="0 0 -0.328" rpy="0 0 ${M_PI}" />
@@ -150,16 +154,17 @@
       <axis xyz="0 0 1" />
       <calibration rising="${arm_4_ref}"/>
       <dynamics damping="5" />
-      <limit effort="176" velocity="2.0" lower="-2.181661565" upper="2.181661565"/>
-      <safety_controller k_position="20" k_velocity="25" soft_lower_limit="${-2.181661565 + 0.01}" soft_upper_limit="${2.181661565 - 0.01}" />
+      <limit effort="176" velocity="2.0" lower="-2.18" upper="2.18"/>
+      <safety_controller k_position="20" k_velocity="25" soft_lower_limit="${-2.18 + 0.01}" soft_upper_limit="${2.18 - 0.01}" />
     </joint>
 
     <link name="${name}_4_link">
-      <inertial>
+      <xacro:default_inertial/>	
+      <!--inertial>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <mass value="2.0"/>
         <inertia ixx="0.03" ixy="0" ixz="0" iyy="0.03" iyz="0" izz="0.03" />
-      </inertial>
+      </inertial-->
       
       <visual>
         <origin xyz="0 0 0" rpy="0 0 ${M_PI}" />
@@ -185,16 +190,17 @@
       <axis xyz="0 0 1" />
       <calibration rising="${arm_5_ref}"/>
       <dynamics damping="5" />
-      <limit effort="41.6" velocity="2.0" lower="-3.141592654" upper="3.141592654" />
-      <safety_controller k_position="20" k_velocity="25" soft_lower_limit="${-3.141592654 + 0.01}" soft_upper_limit="${3.141592654 - 0.01}" />
+      <limit effort="20.7" velocity="0.43633" lower="-M_PI" upper="M_PI" />
+      <safety_controller k_position="20" k_velocity="25" soft_lower_limit="${-M_PI + 0.01}" soft_upper_limit="${M_PI - 0.01}" />
     </joint>
 
     <link name="${name}_5_link">
-      <inertial>
+      <xacro:default_inertial/>	
+      <!--inertial>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <mass value="2.313272"/>
         <inertia ixx="0.03" ixy="0" ixz="0" iyy="0.03" iyz="0" izz="0.03" />
-      </inertial>
+      </inertial-->
       
       <visual>
         <origin xyz="0 0 -0.323" rpy="0 0 ${M_PI}" />
@@ -220,16 +226,17 @@
       <axis xyz="0 0 1" />
       <calibration rising="${arm_6_ref}"/>
       <dynamics damping="5" />
-      <limit effort="20.1" velocity="2.0" lower="-2.0" upper="2.0" />
-      <safety_controller k_position="20" k_velocity="25" soft_lower_limit="${-2.967059728 + 0.01}" soft_upper_limit="${2.967059728 - 0.01}" />
+      <limit effort="15" velocity="1.2566" lower="-2.0" upper="2.0" />
+      <safety_controller k_position="20" k_velocity="25" soft_lower_limit="${-2.0 + 0.01}" soft_upper_limit="${2.0 - 0.01}" />
     </joint>
 
     <link name="${name}_6_link">
-      <inertial>
+      <xacro:default_inertial/>	
+      <!--inertial>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <mass value="2.057856"/>
         <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01" />
-      </inertial>
+      </inertial-->
       
       <visual>
         <origin xyz="0 0 0" rpy="0 ${M_PI} 0" />
@@ -255,16 +262,17 @@
       <axis xyz="0 0 1" />
       <calibration rising="${arm_7_ref}"/>
       <dynamics damping="5" />
-      <limit effort="9.6" velocity="2.0" lower="-2.967059728" upper="2.967059728" />
+      <limit effort="15" velocity="1.2566" lower="-2.967059728" upper="2.967059728" />
       <safety_controller k_position="20" k_velocity="25" soft_lower_limit="${-2.967059728 + 0.01}" soft_upper_limit="${2.967059728 - 0.01}" />
     </joint>
 
     <link name="${name}_7_link">
-      <inertial>
+      <xacro:default_inertial/>	
+      <!--inertial>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <mass value="1.120198"/>
         <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01" />
-      </inertial>
+      </inertial-->
       
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
