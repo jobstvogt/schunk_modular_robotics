@@ -42,7 +42,7 @@
     <joint name="${name}_finger_left_joint" type="prismatic" >
       <parent link="${name}_gripper_link" />
       <child link="${name}_finger_left_link" />
-      <limit effort="100" lower="-0.001" upper="0.033" velocity="2.0"/>
+      <limit effort="100" lower="-0.001" upper="0.033" velocity="0.01"/>
       <calibration rising="${pg70_finger_left_ref}"/>
       <origin xyz="0 0.01 ${0.078}" rpy="0 0 0"/>
       <axis xyz="0 1 0" />
@@ -52,7 +52,7 @@
       <inertial>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <mass value="1"/>
-        <inertia ixx="0.009" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01" />
+        <inertia ixx="0.009" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.05" />
       </inertial>
       <visual>
         <origin xyz="0 0 0.06" rpy="3.14159 0 0" />
@@ -79,7 +79,7 @@
       <mimic joint="${name}_finger_left_joint" multiplier="1" offset="0"/>
       <parent link="${name}_gripper_link" />
       <child link="${name}_finger_right_link" />
-      <limit effort="100" lower="-0.001" upper="0.033" velocity="2.0"/>
+      <limit effort="100" lower="-0.001" upper="0.033" velocity="0.01"/>
       <calibration rising="${pg70_finger_right_ref}"/>
       <origin xyz="0 -0.009 ${0.078}" rpy="-0 0 0"/>
       <axis xyz="0 -1 0" />
@@ -89,7 +89,7 @@
       <inertial>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <mass value="1"/>
-        <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01" />
+        <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.05" />
       </inertial>
       <visual>
         <origin xyz="0 0 0.06" rpy="3.14159 0 3.14159" />
