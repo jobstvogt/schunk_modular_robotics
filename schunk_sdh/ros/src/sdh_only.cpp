@@ -69,17 +69,15 @@
 #include <actionlib/server/simple_action_server.h>
 
 // ROS message includes
-#include <std_msgs/Float32MultiArray.h>
+#include <std_msgs/Float64MultiArray.h>
 #include <trajectory_msgs/JointTrajectory.h>
 #include <sensor_msgs/JointState.h>
 #include <control_msgs/FollowJointTrajectoryAction.h>
 #include <control_msgs/JointTrajectoryControllerState.h>
-#include <brics_actuator/JointVelocities.h>
-#include <brics_actuator/JointValue.h>
 
 // ROS service includes
-#include <cob_srvs/Trigger.h>
-#include <cob_srvs/SetOperationMode.h>
+#include <std_srvs/Trigger.h>
+#include <cob_srvs/SetString.h>
 
 // ROS diagnostic msgs
 #include <diagnostic_msgs/DiagnosticArray.h>
@@ -107,7 +105,6 @@ class SdhNode
 		
 		// topic subscribers
 		ros::Subscriber subSetVelocitiesRaw_;
-		ros::Subscriber subSetVelocities_;
 
 		// service servers
 		ros::ServiceServer srvServer_Init_;
@@ -183,7 +180,7 @@ class SdhNode
 
 			// implementation of topics to publish
 			topicPub_JointState_ = nh_.advertise<sensor_msgs::JointState>("joint_states", 1);
-			topicPub_ControllerState_ = nh_.advertise<control_msgs::JointTrajectoryControllerState>("state", 1);
+			topicPub_ControllerState_ = nh_.advertise<control_msgs::JointTrajectoryControllerState>("joint_trajectory_controller/state", 1);
 			topicPub_Diagnostics_ = nh_.advertise<diagnostic_msgs::DiagnosticArray>("diagnostics", 1);
 
 			// pointer to sdh
@@ -195,8 +192,7 @@ class SdhNode
 			srvServer_Recover_ = nh_.advertiseService("driver/recover", &SdhNode::srvCallback_Init, this); //HACK: There is no recover implemented yet, so we execute a init
 			srvServer_SetOperationMode_ = nh_.advertiseService("driver/set_operation_mode", &SdhNode::srvCallback_SetOperationMode, this);
 			
-			subSetVelocitiesRaw_ = nh_.subscribe("driver/set_velocities_raw", 1, &SdhNode::topicCallback_setVelocitiesRaw, this);
-			subSetVelocities_ = nh_.subscribe("driver/set_velocities", 1, &SdhNode::topicCallback_setVelocities, this);
+			subSetVelocitiesRaw_ = nh_.subscribe("joint_group_velocity_controller/command", 1, &SdhNode::topicCallback_setVelocitiesRaw, this);
 			
 			// getting hardware parameters from parameter server
 			nh_private_.param("sdhdevicetype", sdhdevicetype_, std::string("PCAN"));
@@ -354,7 +350,7 @@ class SdhNode
 			as_.setSucceeded();
 		}
 
-		void topicCallback_setVelocitiesRaw(const std_msgs::Float32MultiArrayPtr& velocities)
+		void topicCallback_setVelocitiesRaw(const std_msgs::Float64MultiArrayPtr& velocities)
 		{
 			if (!isInitialized_)
 			{
@@ -384,49 +380,7 @@ class SdhNode
 
 			hasNewGoal_ = true;
 		}
- 		bool parseDegFromJointValue(const brics_actuator::JointValue& val, double &deg_val){
-		    if (val.unit == "rad/s"){
-			deg_val = val.value  * 180.0 / pi_;
-			return true;
-		    }else if (val.unit == "deg/s"){
-			deg_val = val.value;
-			return true;
-		    }else {
-			ROS_ERROR_STREAM("Rejected message, unit '" << val.unit << "' not supported");
-			return false;
-		    }
-		}
-		void topicCallback_setVelocities(const brics_actuator::JointVelocities::ConstPtr& msg)
-		{
-			if (!isInitialized_)
-			{
-				ROS_ERROR("%s: Rejected, sdh not initialized", action_name_.c_str());
-				return;
-			}
-			if(msg->velocities.size() != velocities_.size()){
-				ROS_ERROR("Velocity array dimension mismatch");
-				return;
-			}
-			if (operationMode_ != "velocity")
-			{
-				ROS_ERROR("%s: Rejected, sdh not in velocity mode", action_name_.c_str());
-				return;
-			}
 
-			// TODO: write proper lock!
-			while (hasNewGoal_ == true ) usleep(10000);
-			bool valid = true;
-
-			valid = valid && parseDegFromJointValue(msg->velocities[0], velocities_[0]); // sdh_knuckle_joint
-			valid = valid && parseDegFromJointValue(msg->velocities[5], velocities_[1]); // sdh_finger22_joint
-			valid = valid && parseDegFromJointValue(msg->velocities[6], velocities_[2]); // sdh_finger23_joint
-			valid = valid && parseDegFromJointValue(msg->velocities[1], velocities_[3]); // sdh_thumb2_joint
-			valid = valid && parseDegFromJointValue(msg->velocities[2], velocities_[4]); // sdh_thumb3_joint
-			valid = valid && parseDegFromJointValue(msg->velocities[3], velocities_[5]); // sdh_finger12_joint
-			valid = valid && parseDegFromJointValue(msg->velocities[4], velocities_[6]); // sdh_finger13_joint
-
-			if (valid) hasNewGoal_ = true;
-		}		
 		/*!
 		* \brief Executes the service callback for init.
 		*
@@ -434,8 +388,8 @@ class SdhNode
 		* \param req Service request
 		* \param res Service response
 		*/
-		bool srvCallback_Init(cob_srvs::Trigger::Request &req,
-							cob_srvs::Trigger::Response &res )
+		bool srvCallback_Init(std_srvs::Trigger::Request &req,
+							std_srvs::Trigger::Response &res )
 		{
 
 			if (isInitialized_ == false)
@@ -473,8 +427,8 @@ class SdhNode
 						else
 						{
 							ROS_ERROR("Currently only support for /dev/can0 and /dev/can1");
-							res.success.data = false;
-							res.error_message.data = "Currently only support for /dev/can0 and /dev/can1";
+							res.success = false;
+							res.message = "Currently only support for /dev/can0 and /dev/can1";
 							return true;
 						}
 						ROS_INFO("Initialized ESDCAN for SDH");	
@@ -484,25 +438,25 @@ class SdhNode
 				catch (SDH::cSDHLibraryException* e)
 				{
 					ROS_ERROR("An exception was caught: %s", e->what());
-					res.success.data = false;
-					res.error_message.data = e->what();
+					res.success = false;
+					res.message = e->what();
 					delete e;
 					return true;
 				}
 				if(!switchOperationMode(operationMode_)){
-					res.success.data = false;
-					res.error_message.data = "Could not set operation mode to '" + operationMode_ + "'";
+					res.success = false;
+					res.message = "Could not set operation mode to '" + operationMode_ + "'";
 					return true;
 				}
 			}
 			else
 			{
 				ROS_WARN("...sdh already initialized...");
-				res.success.data = true;
-				res.error_message.data = "sdh already initialized";
+				res.success = true;
+				res.message = "sdh already initialized";
 			}
 			
-			res.success.data = true;
+			res.success = true;
 			return true;
 		}
 
@@ -513,8 +467,8 @@ class SdhNode
 		* \param req Service request
 		* \param res Service response
 		*/
-		bool srvCallback_Stop(cob_srvs::Trigger::Request &req,
-							cob_srvs::Trigger::Response &res )
+		bool srvCallback_Stop(std_srvs::Trigger::Request &req,
+							std_srvs::Trigger::Response &res )
 		{
 			ROS_INFO("Stopping sdh");
 
@@ -530,7 +484,7 @@ class SdhNode
 			}
 
 		ROS_INFO("Stopping sdh succesfull");
-		res.success.data = true;
+		res.success = true;
 		return true;
 	}
 
@@ -541,12 +495,12 @@ class SdhNode
 	* \param req Service request
 	* \param res Service response
 	*/
-	bool srvCallback_Recover(cob_srvs::Trigger::Request &req,
-							cob_srvs::Trigger::Response &res )
+	bool srvCallback_Recover(std_srvs::Trigger::Request &req,
+							std_srvs::Trigger::Response &res )
 	{
 		ROS_WARN("Service recover not implemented yet");
-		res.success.data = true;
-		res.error_message.data = "Service recover not implemented yet";
+		res.success = true;
+		res.message = "Service recover not implemented yet";
 		return true;
 	}
 	
@@ -557,12 +511,12 @@ class SdhNode
 	* \param req Service request
 	* \param res Service response
 	*/
-	bool srvCallback_SetOperationMode(cob_srvs::SetOperationMode::Request &req,
-									cob_srvs::SetOperationMode::Response &res )
+	bool srvCallback_SetOperationMode(cob_srvs::SetString::Request &req,
+									cob_srvs::SetString::Response &res )
 	{
 		hasNewGoal_ = false;
 		sdh_->Stop();
-		res.success.data = switchOperationMode(req.operation_mode.data);
+		res.success = switchOperationMode(req.data);
 		if( operationMode_ == "position"){
 			sdh_->SetController(SDH::cSDH::eCT_POSE);
 		}else if( operationMode_ == "velocity"){
@@ -576,7 +530,7 @@ class SdhNode
 				delete e;
 			}
 		}else{
-			ROS_ERROR_STREAM("Operation mode '" << req.operation_mode.data << "'  not supported");
+			ROS_ERROR_STREAM("Operation mode '" << req.data << "'  not supported");
 		}
 		return true;
 	}

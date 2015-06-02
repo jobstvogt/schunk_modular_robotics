@@ -69,17 +69,16 @@
 #include <urdf/model.h>
 
 // ROS message includes
+#include <std_msgs/String.h>
+#include <std_msgs/Float64MultiArray.h>
 #include <sensor_msgs/JointState.h>
 #include <trajectory_msgs/JointTrajectory.h>
 #include <control_msgs/JointTrajectoryControllerState.h>
 #include <diagnostic_msgs/DiagnosticArray.h>
-#include <brics_actuator/JointPositions.h>
-#include <brics_actuator/JointVelocities.h>
-
 
 // ROS service includes
-#include <cob_srvs/Trigger.h>
-#include <cob_srvs/SetOperationMode.h>
+#include <std_srvs/Trigger.h>
+#include <cob_srvs/SetString.h>
 
 // own includes
 #include <schunk_powercube_chain/PowerCubeCtrl.h>
@@ -138,12 +137,12 @@ public:
 
     /// implementation of topics to publish
     topicPub_JointState_ = n_.advertise<sensor_msgs::JointState> ("joint_states", 1);
-    topicPub_ControllerState_ = n_.advertise<control_msgs::JointTrajectoryControllerState> ("state", 1);
+    topicPub_ControllerState_ = n_.advertise<control_msgs::JointTrajectoryControllerState> ("joint_trajectory_controller/state", 1);
     topicPub_Diagnostic_ = n_.advertise<diagnostic_msgs::DiagnosticArray>("diagnostics", 1);
 
     /// implementation of topics to subscribe
-    topicSub_CommandPos_ = n_.subscribe("command_pos", 1, &PowerCubeChainNode::topicCallback_CommandPos, this);
-    topicSub_CommandVel_ = n_.subscribe("command_vel", 1, &PowerCubeChainNode::topicCallback_CommandVel, this);
+    topicSub_CommandPos_ = n_.subscribe("joint_group_position_controller/command", 1, &PowerCubeChainNode::topicCallback_CommandPos, this);
+    topicSub_CommandVel_ = n_.subscribe("joint_group_velocity_controller/command", 1, &PowerCubeChainNode::topicCallback_CommandVel, this);
 
     /// implementation of service servers
     srvServer_Init_ = n_.advertiseService("driver/init", &PowerCubeChainNode::srvCallback_Init, this);
@@ -389,9 +388,9 @@ public:
    * \brief Executes the callback from the command_pos topic.
    *
    * Set the current position target.
-   * \param msg JointPositions
+   * \param msg Float64MultiArray
    */
-  void topicCallback_CommandPos(const brics_actuator::JointPositions::ConstPtr& msg)
+  void topicCallback_CommandPos(const std_msgs::Float64MultiArray::ConstPtr& msg)
   {
     ROS_WARN("Received new position command. Skipping command: Position commands currently not implemented");
   }
@@ -400,9 +399,9 @@ public:
    * \brief Executes the callback from the command_vel topic.
    *
    * Set the current velocity target.
-   * \param msg JointVelocities
+   * \param msg Float64MultiArray
    */
-  void topicCallback_CommandVel(const brics_actuator::JointVelocities::ConstPtr& msg)
+  void topicCallback_CommandVel(const std_msgs::Float64MultiArray::ConstPtr& msg)
   {
     ROS_DEBUG("Received new velocity command");
     if (!initialized_)
@@ -423,44 +422,17 @@ public:
     std::vector<std::string> errorMessages;
     pc_ctrl_->getStatus(status, errorMessages);
 
-    /// ToDo: don't rely on position of joint names, but merge them (check between msg.joint_uri and member variable JointStates)
-
     unsigned int DOF = pc_params_->GetDOF();
-    std::vector<std::string> jointNames = pc_params_->GetJointNames();
-    std::vector<double> cmd_vel(DOF);
-    std::string unit = "rad";
 
     /// check dimensions
-    if (msg->velocities.size() != DOF)
+    if (msg->data.size() != DOF)
     {
       ROS_ERROR("Skipping command: Commanded velocities and DOF are not same dimension.");
       return;
     }
-
-    /// parse velocities
-    for (unsigned int i = 0; i < DOF; i++)
-    {
-      /// check joint name
-      if (msg->velocities[i].joint_uri != jointNames[i])
-      {
-        ROS_ERROR("Skipping command: Received joint name %s doesn't match expected joint name %s for joint %d.",msg->velocities[i].joint_uri.c_str(),jointNames[i].c_str(),i);
-        return;
-      }
-
-      /// check unit
-      if (msg->velocities[i].unit != unit)
-      {
-        ROS_ERROR("Skipping command: Received unit %s doesn't match expected unit %s.",msg->velocities[i].unit.c_str(),unit.c_str());
-        return;
-      }
-
-      /// if all checks are successful, parse the velocity value for this joint
-      ROS_DEBUG("Parsing velocity %f for joint %s",msg->velocities[i].value,jointNames[i].c_str());
-      cmd_vel[i] = msg->velocities[i].value;
-    }
     
     /// command velocities to powercubes
-    if (!pc_ctrl_->MoveVel(cmd_vel))
+    if (!pc_ctrl_->MoveVel(msg->data))
     {
        error_ = true;
       error_msg_ = pc_ctrl_->getErrorMessage();
@@ -480,7 +452,7 @@ public:
    * \param req Service request
    * \param res Service response
    */
-  bool srvCallback_Init(cob_srvs::Trigger::Request &req, cob_srvs::Trigger::Response &res)
+  bool srvCallback_Init(std_srvs::Trigger::Request &req, std_srvs::Trigger::Response &res)
   {
     if (!initialized_)
     {
@@ -490,25 +462,25 @@ public:
       if (pc_ctrl_->Init(pc_params_))
       {
         initialized_ = true;
-        res.success.data = true;
+        res.success = true;
         ROS_INFO("...initializing powercubes successful");
       }
 
       else
       {
-            error_ = true;
-             error_msg_ = pc_ctrl_->getErrorMessage();
-        res.success.data = false;
-        res.error_message.data = pc_ctrl_->getErrorMessage();
-        ROS_INFO("...initializing powercubes not successful. error: %s", res.error_message.data.c_str());
+        error_ = true;
+        error_msg_ = pc_ctrl_->getErrorMessage();
+        res.success = false;
+        res.message = pc_ctrl_->getErrorMessage();
+        ROS_INFO("...initializing powercubes not successful. error: %s", res.message.c_str());
       }
     }
 
     else
     {
-      res.success.data = true;
-      res.error_message.data = "powercubes already initialized";
-      ROS_WARN("...initializing powercubes not successful. error: %s",res.error_message.data.c_str());
+      res.success = true;
+      res.message = "powercubes already initialized";
+      ROS_WARN("...initializing powercubes not successful. error: %s",res.message.c_str());
     }
 
     return true;
@@ -521,22 +493,22 @@ public:
    * \param req Service request
    * \param res Service response
    */
-  bool srvCallback_Stop(cob_srvs::Trigger::Request &req, cob_srvs::Trigger::Response &res)
+  bool srvCallback_Stop(std_srvs::Trigger::Request &req, std_srvs::Trigger::Response &res)
   {
     ROS_INFO("Stopping powercubes...");
 
     /// stop powercubes
     if (pc_ctrl_->Stop())
     {
-      res.success.data = true;
+      res.success = true;
       ROS_INFO("...stopping powercubes successful.");
     }
 
     else
     {
-      res.success.data = false;
-      res.error_message.data = pc_ctrl_->getErrorMessage();
-      ROS_ERROR("...stopping powercubes not successful. error: %s", res.error_message.data.c_str());
+      res.success = false;
+      res.message = pc_ctrl_->getErrorMessage();
+      ROS_ERROR("...stopping powercubes not successful. error: %s", res.message.c_str());
     }
     return true;
   }
@@ -548,7 +520,7 @@ public:
    * \param req Service request
    * \param res Service response
    */
-  bool srvCallback_Recover(cob_srvs::Trigger::Request &req, cob_srvs::Trigger::Response &res)
+  bool srvCallback_Recover(std_srvs::Trigger::Request &req, std_srvs::Trigger::Response &res)
   {
     ROS_INFO("Recovering powercubes...");
     if (initialized_)
@@ -556,25 +528,25 @@ public:
       /// stopping all arm movements
       if (pc_ctrl_->Recover())
       {
-            error_ = false;
-            error_msg_ = "";
-      res.success.data = true;
-      ROS_INFO("...recovering powercubes successful.");
+        error_ = false;
+        error_msg_ = "";
+        res.success = true;
+        ROS_INFO("...recovering powercubes successful.");
       }
       else
       {
-      res.success.data = false;
-            error_ = true;
-            error_msg_ = pc_ctrl_->getErrorMessage();
-      res.error_message.data = pc_ctrl_->getErrorMessage();
-      ROS_ERROR("...recovering powercubes not successful. error: %s", res.error_message.data.c_str());
+        res.success = false;
+        error_ = true;
+        error_msg_ = pc_ctrl_->getErrorMessage();
+        res.message = pc_ctrl_->getErrorMessage();
+        ROS_ERROR("...recovering powercubes not successful. error: %s", res.message.c_str());
       }
     }
     else
     {
-      res.success.data = false;
-      res.error_message.data = "powercubes not initialized";
-      ROS_ERROR("...recovering powercubes not successful. error: %s",res.error_message.data.c_str());
+      res.success = false;
+      res.message = "powercubes not initialized";
+      ROS_ERROR("...recovering powercubes not successful. error: %s",res.message.c_str());
     }
 
     return true;
@@ -587,16 +559,16 @@ public:
    * \param req Service request
    * \param res Service response
    */
-  bool srvCallback_SetOperationMode(cob_srvs::SetOperationMode::Request &req, cob_srvs::SetOperationMode::Response &res)
+  bool srvCallback_SetOperationMode(cob_srvs::SetString::Request &req, cob_srvs::SetString::Response &res)
   {
-  if(req.operation_mode.data != "velocity")
+  if(req.data != "velocity")
   {
     ROS_WARN("Powercube chain currently only supports velocity commands");
-    res.success.data = false;
+    res.success = false;
   }
   else
   {
-    res.success.data = true;
+    res.success = true;
   }
   return true;
   }

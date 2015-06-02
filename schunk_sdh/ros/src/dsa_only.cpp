@@ -70,10 +70,6 @@
 #include <schunk_sdh/TactileSensor.h>
 #include <schunk_sdh/TactileMatrix.h>
 
-// ROS service includes
-#include <cob_srvs/Trigger.h>
-#include <cob_srvs/SetOperationMode.h>
-
 // ROS diagnostic msgs
 #include <diagnostic_msgs/DiagnosticArray.h>
 #include <diagnostic_msgs/KeyValue.h>
