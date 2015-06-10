@@ -55,21 +55,21 @@
         <inertia ixx="0.009" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.05" />
       </inertial>
       <visual>
-        <origin xyz="0 0 0.06" rpy="3.14159 0 0" />
+        <origin xyz="-0.015 0.0155 0.055" rpy="3.14159 -1.57 0" />
         <geometry>
-          <mesh filename="package://schunk_description/meshes/pg70/RobotGripperLongV2.stl" scale="0.001 0.001 0.001"/>
+          <mesh filename="package://schunk_description/meshes/pg70/finger_2cm.stl" scale="0.001 0.001 0.001"/>
         </geometry>
-        <material name="blue">
-          <color rgba="0 0 255 1"/>
+        <material name="green">
+          <color rgba="0 255 0 1"/>
         </material>
       </visual>
       <collision>
-        <origin xyz="0 0 0.06" rpy="3.14159 0 0" />
+        <origin xyz="-0.015 0.0155 0.055" rpy="3.14159 -1.57 0" />
         <geometry>
-          <mesh filename="package://schunk_description/meshes/pg70/RobotGripperLongV2.stl" scale="0.001 0.001 0.001"/>
+          <mesh filename="package://schunk_description/meshes/pg70/finger_2cm.stl" scale="0.001 0.001 0.001"/>
         </geometry>
-        <material name="blue">
-          <color rgba="0 0 255 1"/>
+        <material name="green">
+          <color rgba="0 255 0 1"/>
         </material>
       </collision>
     </link>
@@ -92,21 +92,21 @@
         <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.05" />
       </inertial>
       <visual>
-        <origin xyz="0 0 0.06" rpy="3.14159 0 3.14159" />
+        <origin xyz="0.015 -0.0155 0.055" rpy="3.14159 -1.57 3.14159" />
         <geometry>
-          <mesh filename="package://schunk_description/meshes/pg70/RobotGripperLongV2.stl" scale="0.001 0.001 0.001"/>
+          <mesh filename="package://schunk_description/meshes/pg70/finger_2cm.stl" scale="0.001 0.001 0.001"/>
         </geometry>
-        <material name="blue">
-          <color rgba="0 0 255 1"/>
+        <material name="red">
+          <color rgba="255 0 0 1"/>
         </material>
       </visual>
       <collision>
-        <origin xyz="0 0 0.06" rpy="0 0 0" />
+        <origin xyz="0.015 -0.0155 0.055" rpy="3.14159 -1.57 3.14159" />
         <geometry>
-          <box size="0.03 0.02 0.10"/>
+          <mesh filename="package://schunk_description/meshes/pg70/finger_2cm.stl" scale="0.001 0.001 0.001"/>
         </geometry>
-        <material name="black">
-          <color rgba="0 0 0 1"/>
+        <material name="red">
+          <color rgba="255 0 0 1"/>
         </material>
       </collision>
     </link>
