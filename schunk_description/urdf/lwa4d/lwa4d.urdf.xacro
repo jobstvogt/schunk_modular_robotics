@@ -44,8 +44,6 @@
       <parent link="${name}_0_link"/>
       <child link="${name}_1_link"/>
       <axis xyz="0 0 1"/>
-      <calibration rising="${arm_1_ref}"/>
-      <dynamics damping="10" />
       <limit effort="216" velocity="0.43633" lower="${-M_PI+safety_offset}" upper="${M_PI-safety_offset}"/>
     </joint>
 
@@ -80,8 +78,6 @@
       <parent link="${name}_1_link"/>
       <child link="${name}_2_link"/>
       <axis xyz="0 0 1"/>
-      <calibration rising="${arm_2_ref}"/>
-      <dynamics damping="10" />
       <limit effort="216" velocity="0.43633" lower="${-2.14 + safety_offset}" upper="${2.14 - safety_offset}"/>
     </joint>
 
@@ -115,8 +111,6 @@
       <parent link="${name}_2_link"/>
       <child link="${name}_3_link"/>
       <axis xyz="0 0 1"/>
-      <calibration rising="${arm_3_ref}"/>
-      <dynamics damping="5" />
       <limit effort="81.5" velocity="0.4189" lower="${-M_PI + safety_offset}" upper="${M_PI - safety_offset}"/>
     </joint>
 
@@ -149,9 +143,7 @@
       <origin xyz="0 0 -0.328" rpy="-${M_PI/2} 0 0"/>
       <parent link="${name}_3_link"/>
       <child link="${name}_4_link"/>
-      <axis xyz="0 0 1" />
-      <calibration rising="${arm_4_ref}"/>
-      <dynamics damping="5" />
+      <axis xyz="0 0 1"/>
       <limit effort="81.5" velocity="0.4189" lower="${-2.18 + safety_offset}" upper="${2.18 - safety_offset}"/>
     </joint>
 
@@ -184,9 +176,7 @@
       <origin xyz="0 0 0" rpy="${M_PI/2} 0 0" />
       <parent link="${name}_4_link"/>
       <child link="${name}_5_link"/>
-      <axis xyz="0 0 1" />
-      <calibration rising="${arm_5_ref}"/>
-      <dynamics damping="5" />
+      <axis xyz="0 0 1"/>
       <limit effort="20.7" velocity="0.43633" lower="${-M_PI + safety_offset}" upper="${M_PI - safety_offset}"/>
     </joint>
 
@@ -219,9 +209,7 @@
       <origin xyz="0 0 -0.323" rpy="-${M_PI/2} 0 0" />
       <parent link="${name}_5_link"/>
       <child link="${name}_6_link"/>
-      <axis xyz="0 0 1" />
-      <calibration rising="${arm_6_ref}"/>
-      <dynamics damping="5" />
+      <axis xyz="0 0 1"/>
       <limit effort="15" velocity="1.2566" lower="${-2.09 + safety_offset}" upper="${2.09 - safety_offset}"/>
     </joint>
 
@@ -254,9 +242,7 @@
       <origin xyz="0 0 0" rpy="-${M_PI/2} 0 0" />
       <parent link="${name}_6_link"/>
       <child link="${name}_7_link"/>
-      <axis xyz="0 0 1" />
-      <calibration rising="${arm_7_ref}"/>
-      <dynamics damping="5" />
+      <axis xyz="0 0 1"/>
       <limit effort="15" velocity="1.2566" lower="${-2.96 + safety_offset}" upper="${2.96 - safety_offset}"/>
     </joint>
 
